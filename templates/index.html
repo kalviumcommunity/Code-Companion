@@ -1,18 +1,106 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <title>Code Companion</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Code Companion</title> 
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Orbitron:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 </head>
 <body>
-    <h1>Code Companion AI</h1>
-    <p>Ask for any code snippet you need!</p>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <span class="brand-pill" aria-hidden="true"></span>
+        <span class="brand-text">Code Companion</span>
+      </div>
 
-    <form action="/generate" method="post">
-        <textarea name="user_prompt" rows="5" cols="50" placeholder="e.g., Write a Python function to check for a palindrome"></textarea>
-        <br>
-        <button type="submit">Generate Code</button>
-    </form>
+      <div class="header-actions">
+        <button id="theme-toggle" class="btn ghost" aria-label="Toggle dark mode" aria-pressed="true" type="button">
+          <span class="icon" aria-hidden="true">🌙</span>
+          <span class="label">Dark</span>
+        </button>
+      </div>
+    </div>
+  </header>
 
+  <main class="container main">
+    <section class="hero animate-in">
+      <h1 class="headline text-balance">AI-Powered Code Generation</h1>
+      <p class="subhead text-pretty">
+        Ask for any code snippet you need — designed for clarity, speed, and correctness.
+      </p>
+    </section>
+
+    <section class="card card-glow animate-in">
+      <form action="/generate" method="post" class="form-grid" novalidate>
+        <label for="user_prompt" class="label">Your request</label>
+        <textarea
+          id="user_prompt"
+          name="user_prompt"
+          rows="6"
+          required
+          aria-describedby="prompt-help"
+          placeholder="e.g., Write a Python function to check if a string is a palindrome."></textarea>
+        <div id="prompt-help" class="help">Be specific about languages, constraints, and examples.</div>
+
+        <div class="actions">
+          <button type="submit" class="btn primary">
+            <span class="glow-dot" aria-hidden="true"></span>
+            Generate Code
+          </button>
+        </div>
+      </form>
+    </section>
+
+    {% if ai_response %}
+    <section class="card response animate-in" aria-live="polite" aria-atomic="true">
+      <div class="response-header">
+        <h2 class="response-title">AI Response</h2>
+      </div>
+      <div class="response-body">
+        {{ ai_response|safe }}
+      </div>
+    </section>
+    {% endif %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p class="muted">Built with ❤️ by Code Companion</p>
+    </div>
+  </footer>
+  <script>
+    // Persist theme preference and toggle the data-theme attribute
+    (function () {
+      const root = document.documentElement;
+      const saved = localStorage.getItem('cc-theme');
+      if (saved === 'light' || saved === 'dark') {
+        root.setAttribute('data-theme', saved);
+      }
+      const btn = document.getElementById('theme-toggle');
+      const applyState = () => {
+        const isDark = root.getAttribute('data-theme') !== 'light';
+        btn.setAttribute('aria-pressed', String(isDark));
+        const icon = btn.querySelector('.icon');
+        const label = btn.querySelector('.label');
+        if (isDark) {
+          icon.textContent = '🌙';
+          label.textContent = 'Dark';
+        } else {
+          icon.textContent = '🌞';
+          label.textContent = 'Light';
+        }
+      };
+      applyState();
+      btn?.addEventListener('click', () => {
+        const current = root.getAttribute('data-theme');
+        const next = current === 'light' ? 'dark' : 'light';
+        root.setAttribute('data-theme', next);
+        localStorage.setItem('cc-theme', next);
+        applyState();
+      });
+    })();
+  </script>
 </body>
 </html>
